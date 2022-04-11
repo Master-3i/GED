@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -58,8 +59,42 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+
+        echo $request->user();
+
         $request->user()->currentAccessToken()->delete();
 
         return response('logout', 200);
+    }
+
+
+    public function sendPasswordLink(Request $request)
+    {
+        $validate = $request->validate([
+            'email' => 'required|email'
+        ]);
+
+
+        $user = User::where('email', $validate['email'])->first();
+        if (!$user) return response(['message' => 'No account under this email', 'code' => 'NO_ACCOUNT'], 400);
+
+        $TO_NAME = $user->first_name . " " . $user->last_name;
+        $TO_EMAIL = $user->email;
+        $rand_number = rand(111111, 999999);
+        $data = array('name' => 'no-reply (GED APP)', 'body' => 'verification code : ' . $rand_number);
+
+        Mail::send('emails.mail', $data, function ($message) use ($TO_NAME, $TO_EMAIL) {
+            $message->to($TO_EMAIL, $TO_NAME)->subject('RESET PASSWORD');
+            $message->from('gedmaster3i@gmail.com', 'RESET PASSWORD');
+        });
+
+        //TODO:need to store user id and 
+
+        return response(['message' => 'email sent'], 200);
+    }
+
+
+    public function resetPassword(Request $request)
+    {
     }
 }

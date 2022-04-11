@@ -18,6 +18,7 @@ use App\Http\Controllers\PostController;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/sendResetPasswordLink', [AuthController::class, 'sendPasswordLink']);
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
