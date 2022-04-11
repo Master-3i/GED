@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Facade;
 
+
+echo 'awa';
+
 return [
 
     /*
