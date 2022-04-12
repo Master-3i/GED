@@ -118,7 +118,26 @@ class AuthController extends Controller
 
         //varify expiration date and the token
         if (!$request->has('t') || !$request->has('uid')) return response(['message' => 'No given info'], 400);
-        $checkToken = ResetPassword::where('user_id', $request->query('uid'))->where('token', $request->query('t'));
+        $checkToken = ResetPassword::where('user_id', $request->query('uid'))->where('token', $request->query('t'))->first();
         if (!$checkToken) return response('invalid token', 400);
+
+        echo $checkToken->token;
+
+        $date_expiration = new Carbon($checkToken->expiration);
+        $date_now = new Carbon(Date::now());
+
+        if ($date_now->gt($date_expiration)) return response(['message' => 'verification link is expired', 'code' => 'VERIFICATION_EXPIRED'], 400);
+        $validate = $request->validate([
+            'password' => 'required|min:8'
+        ]);
+
+        $updatePassword = User::where('_id', '=', $request->query('uid'))->first();
+        $updatePassword->password = bcrypt($validate['password']);
+        $updatePassword->save();
+
+
+        ResetPassword::where('_id', $checkToken->_id)->delete();
+
+        return response('reset password', 201);
     }
 }
