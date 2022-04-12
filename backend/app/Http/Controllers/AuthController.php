@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ResetPassword;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -78,17 +82,31 @@ class AuthController extends Controller
         $user = User::where('email', $validate['email'])->first();
         if (!$user) return response(['message' => 'No account under this email', 'code' => 'NO_ACCOUNT'], 400);
 
+        //delete all existing reset_password documents
+
+        ResetPassword::where('user_id', $user->_id)->delete();
+
+        $random_token = Str::random(16);
+        $expiration = Date::now()->addMinutes(30);
+        $sendToken = new ResetPassword();
+        $sendToken->expiration = $expiration;
+        $sendToken->token = $random_token;
+        $sendToken->user()->associate($user);
+
+        $saveToken = $sendToken->save();
+
+        if (!$saveToken) return response('Error during saving token', 400);
+
         $TO_NAME = $user->first_name . " " . $user->last_name;
         $TO_EMAIL = $user->email;
-        $rand_number = rand(111111, 999999);
-        $data = array('name' => 'no-reply (GED APP)', 'body' => 'verification code : ' . $rand_number);
+
+        $data = array('name' => 'no-reply (GED APP)', 'body' => 'Link to reset password : http://localhost:4000/resetpassword?t=' . $random_token . "&uid=" . $user->_id);
+
 
         Mail::send('emails.mail', $data, function ($message) use ($TO_NAME, $TO_EMAIL) {
             $message->to($TO_EMAIL, $TO_NAME)->subject('RESET PASSWORD');
             $message->from('gedmaster3i@gmail.com', 'RESET PASSWORD');
         });
-
-        //TODO:need to store user id and 
 
         return response(['message' => 'email sent'], 200);
     }
@@ -96,5 +114,11 @@ class AuthController extends Controller
 
     public function resetPassword(Request $request)
     {
+        //TODO: should check uid and token after we change the password to the new one
+
+        //varify expiration date and the token
+        if (!$request->has('t') || !$request->has('uid')) return response(['message' => 'No given info'], 400);
+        $checkToken = ResetPassword::where('user_id', $request->query('uid'))->where('token', $request->query('t'));
+        if (!$checkToken) return response('invalid token', 400);
     }
 }
