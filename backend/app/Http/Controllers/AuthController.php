@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pack;
+use App\Models\PackUser;
 use App\Models\ResetPassword;
 use App\Models\User;
 use Carbon\Carbon;
@@ -33,11 +35,24 @@ class AuthController extends Controller
 
         $user->save();
 
+        if (!$user) return response("Something went wrong, please try again ", 400);
+
+        $newPackUser = new PackUser;
+        $newPackUser->user_storage = 0;
+        $newPackUser->user_group = 0;
+        $newPackUser->status = "free";
+        $newPackUser->pack()->associate(Pack::where("package_name", "Free")->first());
+        $newPackUser->user()->associate($user);
+
+        $createPackUser = $newPackUser->save();
+        if (!$createPackUser) return response("Something went Wrong", 400);
+
         $token = $user->createToken("GED_GID")->plainTextToken;
 
         $response = [
             'user' => $user,
-            'token' => $token
+            'token' => $token,
+            'userPack' => $newPackUser
         ];
 
         return response($response, 201);
@@ -118,7 +133,25 @@ class AuthController extends Controller
 
         //varify expiration date and the token
         if (!$request->has('t') || !$request->has('uid')) return response(['message' => 'No given info'], 400);
-        $checkToken = ResetPassword::where('user_id', $request->query('uid'))->where('token', $request->query('t'));
+        $checkToken = ResetPassword::where('user_id', $request->query('uid'))->where('token', $request->query('t'))->first();
         if (!$checkToken) return response('invalid token', 400);
+
+
+        $date_expiration = new Carbon($checkToken->expiration);
+        $date_now = new Carbon(Date::now());
+
+        if ($date_now->gt($date_expiration)) return response(['message' => 'verification link is expired', 'code' => 'VERIFICATION_EXPIRED'], 400);
+        $validate = $request->validate([
+            'password' => 'required|min:8'
+        ]);
+
+        $updatePassword = User::where('_id', '=', $request->query('uid'))->first();
+        $updatePassword->password = bcrypt($validate['password']);
+        $updatePassword->save();
+
+
+        ResetPassword::where('_id', $checkToken->_id)->delete();
+
+        return response('reset password', 201);
     }
 }
