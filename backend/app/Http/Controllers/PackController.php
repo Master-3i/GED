@@ -34,7 +34,7 @@ class PackController extends Controller
 
         $newPack = new Pack;
         $newPack->package_name = $validate['package_name'];
-        $newPack->storage_limit = $validate['storate_limit'];
+        $newPack->storage_limit = $validate['storage_limit'];
         $newPack->group_limit = $validate['group_limit'];
         $newPack->group_storage_limit = $validate['group_storage_limit'];
 

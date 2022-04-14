@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PackController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
@@ -25,6 +26,11 @@ Route::post('/auth/resetpassword', [AuthController::class, 'resetPassword']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 });
+
+
+Route::resource('packs', PackController::class)->only([
+    'store', 'update', 'destroy', 'show'
+]);
 
 Route::resource('posts', PostController::class)->only([
     'destroy', 'show', 'store', 'update'
