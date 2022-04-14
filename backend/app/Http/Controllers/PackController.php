@@ -79,7 +79,7 @@ class PackController extends Controller
         ]);
 
         $showPack->package_name = $validate['package_name'];
-        $showPack->storage_limit = $validate['storate_limit'];
+        $showPack->storage_limit = $validate['storage_limit'];
         $showPack->group_limit = $validate['group_limit'];
         $showPack->group_storage_limit = $validate['group_storage_limit'];
 

@@ -11,7 +11,8 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-export default function Index() {
+
+export default function Register() {
   const { register, handleSubmit } = useForm();
 
   const handleLogin = (data) => {
@@ -35,6 +36,32 @@ export default function Index() {
               onSubmit={handleSubmit(handleLogin)}
             >
               <VStack spacing={3}>
+                <HStack spacing={3}>
+                  <FormControl>
+                    <Input
+                      type={"first_name"}
+                      placeholder={"First Name"}
+                      _placeholder={{ color: "gray.500" }}
+                      _focus={{ borderColor: "purple.300", borderWidth: "2px" }}
+                      {...register("first_name", {
+                        required: true,
+                        minLength: 3,
+                      })}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <Input
+                      type={"last_name"}
+                      placeholder={"Last Name"}
+                      _placeholder={{ color: "gray.500" }}
+                      _focus={{ borderColor: "purple.300", borderWidth: "2px" }}
+                      {...register("last_name", {
+                        required: true,
+                        minLength: 3,
+                      })}
+                    />
+                  </FormControl>
+                </HStack>
                 <FormControl>
                   <Input
                     type={"email"}
@@ -59,23 +86,20 @@ export default function Index() {
                   color="white"
                   type="submit"
                 >
-                  Sign in
+                  Register
                 </Button>
-                <Text color={"purple.300"} as="a" fontWeight={"semibold"}>
-                  Forgot Password ?
-                </Text>
                 <HStack>
                   <Text color={"gray.500"}>
-                    Create an account{"  "}
+                    Already have an account ?{"  "}
                     <a
-                      href="/register"
+                      href="/login"
                       style={{
                         color: "rgb(183, 148, 244)",
                         fontWeight: "semibold",
                       }}
                     >
                       {" "}
-                      Register
+                      Login
                     </a>
                   </Text>
                 </HStack>

@@ -11,7 +11,10 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-export default function Index() {
+
+
+
+export default function Login() {
   const { register, handleSubmit } = useForm();
 
   const handleLogin = (data) => {
