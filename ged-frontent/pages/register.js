@@ -9,14 +9,35 @@ import {
   Spacer,
   Button,
 } from "@chakra-ui/react";
-import Link from "next/link";
+import axios from "axios";
 import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "react-query";
+import instance, { setAuthorizationHeader } from "../axiosConfig";
 
 export default function Register() {
+  const queryClient = useQueryClient();
+
   const { register, handleSubmit } = useForm();
 
+  const registerUser = useMutation(
+    async (datafield) => {
+      const { data } = await instance.post("/auth/register", datafield);
+      return data;
+    },
+    {
+      onSuccess: (data, variables, context) => {
+        queryClient.setQueryData("user", data);
+        setAuthorizationHeader(data.token);
+      },
+    }
+  );
+
   const handleLogin = (data) => {
-    console.log("data", data);
+    try {
+      registerUser.mutate(data);
+    } catch (err) {
+      console.error("register  error : ", err);
+    }
   };
 
   return (
@@ -111,3 +132,18 @@ export default function Register() {
     </HStack>
   );
 }
+
+// export async function getServerSideProps(ctx) {
+//   console.log(ctx.req.cookies.gid);
+
+//   const token = ctx.req.cookies.gid ? ctx.req.cookies.gid : null;
+//   if (token) {
+//     return {
+//       redirect: {
+//         direction: "/",
+//         permanent: false,
+//       },
+//     };
+//   }
+//   return { props: {} };
+// }

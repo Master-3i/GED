@@ -9,6 +9,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -55,7 +56,7 @@ class AuthController extends Controller
             'userPack' => $newPackUser
         ];
 
-        return response($response, 201);
+        return response($response, 201)->cookie("gid", $token);
     }
 
 
@@ -72,7 +73,7 @@ class AuthController extends Controller
 
         $token = $user->createToken("GED_GID")->plainTextToken;
 
-        return response(['user' => $user, 'token' => $token], 200);
+        return response(['user' => $user, 'token' => $token], 200)->cookie("gid", $token, "/", "http://localhost:3000", false, true);
     }
 
 
@@ -153,5 +154,27 @@ class AuthController extends Controller
         ResetPassword::where('_id', $checkToken->_id)->delete();
 
         return response('reset password', 201);
+    }
+
+
+    public function refreshToken(Request $request)
+    {
+        $oldToken = $request->cookie("gid");
+        if (!$oldToken) return response('Unauthorized', 401);
+        $tokenId = explode("|", $oldToken)[0];
+        echo "old token : " . $oldToken;
+        echo "\n";
+        $userId = DB::collection("personal_access_tokens")->where("_id", $tokenId)->first()["tokenable_id"];
+        $user = DB::collection("users")->where("_id", $userId)->get();
+
+        $token = $user->createToken("GED_GID")->plainTextToken;
+        // $token = $user->tokens()->where('_id', $tokenId)->first();
+
+
+        // echo $token;
+
+
+        // return response(['token' => $token], 200)->cookie("gid", $token);
+        return response('233');
     }
 }
