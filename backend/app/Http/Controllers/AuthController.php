@@ -73,7 +73,10 @@ class AuthController extends Controller
 
         $token = $user->createToken("GED_GID")->plainTextToken;
 
-        return response(['user' => $user, 'token' => $token], 200)->cookie("gid", $token, "/", "http://localhost:3000", false, true);
+
+        $userPack = PackUser::where("user_id", $user->_id);
+
+        return response(['user' => $user, 'token' => $token, "userPack" => $userPack], 200)->cookie("gid", $token);
     }
 
 
@@ -84,7 +87,7 @@ class AuthController extends Controller
 
         $request->user()->currentAccessToken()->delete();
 
-        return response('logout', 200);
+        return response('logout', 200)->withoutCookie("gid");
     }
 
 
@@ -116,7 +119,7 @@ class AuthController extends Controller
         $TO_NAME = $user->first_name . " " . $user->last_name;
         $TO_EMAIL = $user->email;
 
-        $data = array('name' => 'no-reply (GED APP)', 'body' => 'Link to reset password : http://localhost:4000/resetpassword?t=' . $random_token . "&uid=" . $user->_id);
+        $data = array('name' => 'no-reply (GED APP)', 'body' => 'Link to reset password : http://localhost:3000/resetpassword?t=' . $random_token . "&uid=" . $user->_id);
 
 
         Mail::send('emails.mail', $data, function ($message) use ($TO_NAME, $TO_EMAIL) {
@@ -160,14 +163,11 @@ class AuthController extends Controller
     public function refreshToken(Request $request)
     {
         $oldToken = $request->cookie("gid");
-        if (!$oldToken) return response('Unauthorized', 401);
+        if (!$oldToken) return response('Unauthorized', 200);
         $tokenId = explode("|", $oldToken)[0];
-        echo "old token : " . $oldToken;
-        echo "\n";
         $userId = DB::collection("personal_access_tokens")->where("_id", $tokenId)->first()["tokenable_id"];
-        $user = DB::collection("users")->where("_id", $userId)->get();
-
-        $token = $user->createToken("GED_GID")->plainTextToken;
+        $user = User::where("_id", $userId)->first();
+        $userPack = PackUser::where("user_id", $user->_id)->first();
         // $token = $user->tokens()->where('_id', $tokenId)->first();
 
 
@@ -175,6 +175,11 @@ class AuthController extends Controller
 
 
         // return response(['token' => $token], 200)->cookie("gid", $token);
-        return response('233');
+        $response = [
+            "user" => $user,
+            "userPack" => $userPack,
+            "token" => $oldToken
+        ];
+        return response($response, 200);
     }
 }
