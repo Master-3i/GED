@@ -13,9 +13,11 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import instance, { setAuthorizationHeader } from "../axiosConfig";
+import { useRouter } from "next/router";
 
 export default function Register() {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const { register, handleSubmit } = useForm();
 
@@ -35,6 +37,7 @@ export default function Register() {
   const handleLogin = (data) => {
     try {
       registerUser.mutate(data);
+      router.push("/my-ged");
     } catch (err) {
       console.error("register  error : ", err);
     }

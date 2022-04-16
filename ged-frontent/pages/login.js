@@ -11,14 +11,38 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-
-
+import { useMutation, useQueryClient } from "react-query";
+import instance, { setAuthorizationHeader } from "../axiosConfig";
+import { useRouter } from "next/router";
 
 export default function Login() {
   const { register, handleSubmit } = useForm();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const loginUser = useMutation(
+    async ({ email, password }) => {
+      const { data } = await instance.post("/auth/login", {
+        email: email,
+        password,
+      });
+      return data;
+    },
+    {
+      onSuccess: (data, variables, context) => {
+        queryClient.setQueryData("user", data);
+        setAuthorizationHeader(data.token);
+      },
+    }
+  );
 
   const handleLogin = (data) => {
-    console.log("data", data);
+    try {
+      loginUser.mutate({ email: data.email, password: data.password });
+      router.push("/my-ged");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
