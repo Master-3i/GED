@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { useQueryClient } from "react-query";
 export default function Index() {
   const { register, handleSubmit } = useForm();
 

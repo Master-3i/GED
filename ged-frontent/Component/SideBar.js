@@ -41,6 +41,7 @@ import { ReactText } from "react";
 import instance from "../axiosConfig";
 import { useRouter } from "next/router";
 import { useQueryClient } from "react-query";
+import { getToken, logout } from "../token";
 
 const LinkItems = [
   { name: "Mon GED", icon: AiFillFile },
@@ -49,6 +50,7 @@ const LinkItems = [
 
 export default function SidebarWithHeader({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {user} = getToken();
   const queryClient = useQueryClient();
   return (
     <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
@@ -70,7 +72,7 @@ export default function SidebarWithHeader({ children }) {
         </DrawerContent>
       </Drawer>
       {/* mobilenav */}
-      <MobileNav onOpen={onOpen} user={queryClient.getQueryData("user").user} />
+      <MobileNav onOpen={onOpen} user={user} />
       <Box ml={{ base: 0, md: 60 }} p="4">
         {children}
       </Box>
@@ -168,6 +170,7 @@ const MobileNav = ({ onOpen, user, ...rest }) => {
   const handleLogout = () => {
     try {
       instance.post("/auth/logout");
+      logout();
       router.push("/");
     } catch (err) {
       console.log(err);

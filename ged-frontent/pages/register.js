@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import instance, { setAuthorizationHeader } from "../axiosConfig";
 import { useRouter } from "next/router";
+import { setToken } from "../token";
 
 export default function Register() {
   const queryClient = useQueryClient();
@@ -30,6 +31,7 @@ export default function Register() {
       onSuccess: (data, variables, context) => {
         queryClient.setQueryData("user", data);
         setAuthorizationHeader(data.token);
+        setToken(data);
       },
     }
   );

@@ -74,7 +74,7 @@ class AuthController extends Controller
         $token = $user->createToken("GED_GID")->plainTextToken;
 
 
-        $userPack = PackUser::where("user_id", $user->_id);
+        $userPack = PackUser::where("user_id", $user->_id)->first();
 
         return response(['user' => $user, 'token' => $token, "userPack" => $userPack], 200)->cookie("gid", $token);
     }
@@ -162,7 +162,8 @@ class AuthController extends Controller
 
     public function refreshToken(Request $request)
     {
-        $oldToken = $request->cookie("gid");
+
+        $oldToken = $request->query("token");
         if (!$oldToken) return response('Unauthorized', 200);
         $tokenId = explode("|", $oldToken)[0];
         $userId = DB::collection("personal_access_tokens")->where("_id", $tokenId)->first()["tokenable_id"];
