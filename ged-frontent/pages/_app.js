@@ -16,13 +16,14 @@ MyApp.getInitialProps = async ({ ctx }) => {
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
-    window.addEventListener("beforeunload", refreshAccessToken);
-    return () => () => {
-      window.removeEventListener("beforeunload", refreshAccessToken);
-    };
+    refreshAccessToken();
+    // window.addEventListener("beforeunload", refreshAccessToken);
+    // return () => () => {
+    //   window.removeEventListener("beforeunload", refreshAccessToken);
+    // };
   }, []);
 
-  refreshAccessToken();
+  // refreshAccessToken();
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider>

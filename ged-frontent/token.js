@@ -3,7 +3,7 @@ import AES from "crypto-js/aes";
 import CryptoJS from "crypto-js/core";
 import { setAuthorizationHeader } from "./axiosConfig";
 
-export const isBrowser = () => typeof window !== "undefined";
+const isBrowser = () => typeof Window !== "undefined";
 
 export const Encrypted = (data) => {
   return AES.encrypt(
@@ -23,13 +23,11 @@ export const Decrypted = (ciphertext) => {
 };
 
 export const logout = () => {
-  if (isBrowser()) {
-    localStorage.removeItem("GED_TOKEN");
-  }
+  localStorage.removeItem("GED_TOKEN");
 };
 
 export const setToken = (data) => {
-  if (data && isBrowser) {
+  if (data) {
     localStorage.setItem("GED_TOKEN", Encrypted(data));
     console.log(localStorage.getItem("GED_TOKEN"));
   }
@@ -37,7 +35,7 @@ export const setToken = (data) => {
 
 export const getToken = () => {
   let GED_TOKEN =
-    isBrowser() && localStorage.getItem("GED_TOKEN")
+     localStorage.getItem("GED_TOKEN")
       ? Decrypted(localStorage.getItem("GED_TOKEN"))
       : { user: null, userPack: null, token: null };
   return GED_TOKEN;
