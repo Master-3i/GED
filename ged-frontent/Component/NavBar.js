@@ -1,86 +1,40 @@
-import React, { ReactNode } from "react";
 import {
-  IconButton,
-  Avatar,
   Box,
-  CloseButton,
   Flex,
-  HStack,
-  VStack,
-  Icon,
-  useColorModeValue,
-  Link,
-  Drawer,
-  DrawerContent,
   Text,
-  useDisclosure,
-  BoxProps,
-  FlexProps,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
+  CloseButton,
   Button,
   Divider,
+  Link,
+  Icon,
+  useColorModeValue,
+  IconButton,
+  HStack,
+  Menu,
+  MenuButton,
+  Avatar,
+  VStack,
+  MenuList,
+  MenuItem,
+  MenuDivider,
 } from "@chakra-ui/react";
-import {
-  FiHome,
-  FiTrendingUp,
-  FiCompass,
-  FiStar,
-  FiSettings,
-  FiMenu,
-  FiBell,
-  FiChevronDown,
-} from "react-icons/fi";
+
 import { AiFillFile, AiOutlineFileAdd } from "react-icons/ai";
 import { BsShareFill } from "react-icons/bs";
-import { IconType } from "react-icons";
-import { ReactText } from "react";
+import { FiMenu, FiBell, FiChevronDown } from "react-icons/fi";
+
 import instance from "../axiosConfig";
+import { logout } from "../token";
+
 import { useRouter } from "next/router";
-import { useQueryClient } from "react-query";
-import { getToken, logout } from "../token";
+import NewButton from "./NewButton";
 
 const LinkItems = [
   { name: "Mon GED", icon: AiFillFile },
   { name: "Partagés avec moi", icon: BsShareFill },
 ];
 
-export default function SidebarWithHeader({ children }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const {user} = getToken();
-  const queryClient = useQueryClient();
-  return (
-    <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
-      <SidebarContent
-        onClose={() => onClose}
-        display={{ base: "none", md: "block" }}
-      />
-      <Drawer
-        autoFocus={false}
-        isOpen={isOpen}
-        placement="left"
-        onClose={onClose}
-        returnFocusOnClose={false}
-        onOverlayClick={onClose}
-        size="full"
-      >
-        <DrawerContent>
-          <SidebarContent onClose={onClose} />
-        </DrawerContent>
-      </Drawer>
-      {/* mobilenav */}
-      <MobileNav onOpen={onOpen} user={user} />
-      <Box ml={{ base: 0, md: 60 }} p="4">
-        {children}
-      </Box>
-    </Box>
-  );
-}
-
-const SidebarContent = ({ onClose, ...rest }) => {
+export const SidebarContent = ({ onClose, ...rest }) => {
   return (
     <Box
       transition="3s ease"
@@ -107,15 +61,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
         role="group"
         cursor="pointer"
       >
-        <Button
-          leftIcon={<AiOutlineFileAdd />}
-          w="full"
-          bg={"purple.300"}
-          color="white"
-          _hover={{ backgroundColor: "purple.500" }}
-        >
-          Nouveau
-        </Button>
+        <NewButton />
       </Flex>
 
       {LinkItems.map((link) => (
@@ -128,7 +74,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
   );
 };
 
-const NavItem = ({ icon, children, ...rest }) => {
+export const NavItem = ({ icon, children, ...rest }) => {
   return (
     <Link
       href="#"
@@ -164,7 +110,7 @@ const NavItem = ({ icon, children, ...rest }) => {
   );
 };
 
-const MobileNav = ({ onOpen, user, ...rest }) => {
+export const MobileNav = ({ onOpen, user, ...rest }) => {
   const router = useRouter();
 
   const handleLogout = () => {

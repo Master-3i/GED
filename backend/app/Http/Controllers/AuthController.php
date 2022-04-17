@@ -48,12 +48,15 @@ class AuthController extends Controller
         $createPackUser = $newPackUser->save();
         if (!$createPackUser) return response("Something went Wrong", 400);
 
+        $pack = Pack::where("_id", $newPackUser->pack_id)->first();
+
         $token = $user->createToken("GED_GID")->plainTextToken;
 
         $response = [
             'user' => $user,
             'token' => $token,
-            'userPack' => $newPackUser
+            'userPack' => $newPackUser,
+            "pack" => $pack
         ];
 
         return response($response, 201)->cookie("gid", $token);
@@ -74,9 +77,11 @@ class AuthController extends Controller
         $token = $user->createToken("GED_GID")->plainTextToken;
 
 
-        $userPack = PackUser::where("user_id", $user->_id);
+        $userPack = PackUser::where("user_id", $user->_id)->first();
 
-        return response(['user' => $user, 'token' => $token, "userPack" => $userPack], 200)->cookie("gid", $token);
+        $pack = Pack::where("_id", $userPack->pack_id)->first();
+
+        return response(['user' => $user, 'token' => $token, "userPack" => $userPack, "pack" => $pack], 200)->cookie("gid", $token);
     }
 
 
@@ -162,12 +167,14 @@ class AuthController extends Controller
 
     public function refreshToken(Request $request)
     {
-        $oldToken = $request->cookie("gid");
+
+        $oldToken = $request->query("token");
         if (!$oldToken) return response('Unauthorized', 200);
         $tokenId = explode("|", $oldToken)[0];
         $userId = DB::collection("personal_access_tokens")->where("_id", $tokenId)->first()["tokenable_id"];
         $user = User::where("_id", $userId)->first();
         $userPack = PackUser::where("user_id", $user->_id)->first();
+        $pack = Pack::where("_id", $userPack->pack_id)->first();
         // $token = $user->tokens()->where('_id', $tokenId)->first();
 
 
@@ -178,7 +185,8 @@ class AuthController extends Controller
         $response = [
             "user" => $user,
             "userPack" => $userPack,
-            "token" => $oldToken
+            "token" => $oldToken,
+            "pack" => $pack
         ];
         return response($response, 200);
     }

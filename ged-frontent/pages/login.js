@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import instance, { setAuthorizationHeader } from "../axiosConfig";
 import { useRouter } from "next/router";
+import { setToken } from "../token";
 
 export default function Login() {
   const { register, handleSubmit } = useForm();
@@ -30,16 +31,20 @@ export default function Login() {
     },
     {
       onSuccess: (data, variables, context) => {
+        console.log("data : ", data);
         queryClient.setQueryData("user", data);
         setAuthorizationHeader(data.token);
+        setToken(data)
+        router.push("/my-ged");
       },
     }
   );
 
-  const handleLogin = (data) => {
+  const handleLogin = async (data) => {
     try {
-      loginUser.mutate({ email: data.email, password: data.password });
-      router.push("/my-ged");
+      const response =  await loginUser.mutate({ email: data.email, password: data.password });
+      console.log("response : ", response)
+      
     } catch (err) {
       console.error(err);
     }

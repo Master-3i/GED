@@ -3,40 +3,30 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { QueryClientProvider, QueryClient, useQueryClient } from "react-query";
 import { useEffect } from "react";
 import instance, { setAuthorizationHeader } from "../axiosConfig";
+import axios from "axios";
+import { refreshAccessToken } from "../token";
 
 const queryClient = new QueryClient();
 
-MyApp.getInitialProps = ({ ctx }) => {
+MyApp.getInitialProps = async ({ ctx }) => {
   return {
     token: ctx.req?.cookies.gid ? ctx.req?.cookies.gid : null,
   };
 };
 
-const RefresherComponent = ({ token }) => {
-  const q = useQueryClient();
-
-  const setUserQuery = async () => {
-    if (token) {
-      const { data } = await instance.get("/auth/refresh");
-      q.setQueryData("user", data);
-      setAuthorizationHeader(token);
-    }
-  };
-
+function MyApp({ Component, pageProps }) {
   useEffect(() => {
-    setUserQuery();
+    refreshAccessToken();
+    // window.addEventListener("beforeunload", refreshAccessToken);
+    // return () => () => {
+    //   window.removeEventListener("beforeunload", refreshAccessToken);
+    // };
   }, []);
-  return (
-    <>
-    </>
-  );
-};
 
-function MyApp({ Component, pageProps, token }) {
+  // refreshAccessToken();
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider>
-        <RefresherComponent token={token ? token : null} />
         <Component {...pageProps} />
       </ChakraProvider>
     </QueryClientProvider>
