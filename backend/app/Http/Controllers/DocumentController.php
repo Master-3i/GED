@@ -1,8 +1,10 @@
-
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Document;
+use App\Models\Pack;
+use App\Models\PackUser;
 use Illuminate\Http\Request;
 
 class DocumentController extends Controller
@@ -25,6 +27,25 @@ class DocumentController extends Controller
         return response(["documents" => $userDocuments], 200);
     }
 
+    /** Upload document
+     * @param  \App\Models\User $user
+     * @param float $size
+     * @param boolean $is_self
+     * 
+     * @return boolean
+     */
+
+    protected function checkUserStorage($user, $size, $is_self)
+    {
+        $userPack = PackUser::where("user_id", $user->_id)->first();
+        $pack = Pack::where("_id", $userPack->pack_id)->first();
+
+        if ($is_self && (floatval($pack->storage_limit) < floatval($userPack->user_storage) + floatval($size))) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -34,17 +55,26 @@ class DocumentController extends Controller
     public function store(Request $request)
     {
         //
+        if (!$request->hasFile("document")) return response("No valid file", 400);
         $user = $request->user();
 
-        $newDocument = new Document();
-        $newDocument->file = [
-            "label"=>$request->file->label,
-            "ext"=>$request->file->ext,
-            "description"=>$request->file->description,
-            "path"=>$request->file->path,
-        ];
-        $newDocument->is_public = false;
+        if ($this->checkUserStorage($user, $request->file("document")->getSize(), true)) {
+
+            $newDocument = new Document();
+            $path = $request->file("document")->store($user->_id);
+            $newDocument->file = [
+                "label" => $request->file->label,
+                "ext" => $request->file("document")->extension(),
+                "description" => $request->file->description,
+                "path" => $request->file->path,
+            ];
+            $newDocument->keywords = $request->keywords;
+            $newDocument->is_archived = false;
+            $newDocument->is_public = false;
+        }
     }
+
+
 
     /**
      * Display the specified resource.

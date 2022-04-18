@@ -10,8 +10,10 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -35,6 +37,10 @@ class AuthController extends Controller
         $user->password = bcrypt($validate['password']);
 
         $user->save();
+
+        $makeDir = Storage::disk('local')->makeDirectory($user->_id);
+
+        echo $makeDir;
 
         if (!$user) return response("Something went wrong, please try again ", 400);
 

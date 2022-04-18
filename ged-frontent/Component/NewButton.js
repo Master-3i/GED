@@ -4,13 +4,23 @@ import {
   MenuList,
   MenuItem,
   MenuDivider,
+  useDisclosure,
 } from "@chakra-ui/react";
 
 import { AiFillPlusSquare } from "react-icons/ai";
-
-
+import DocumentModal from "./DocumentModal";
 
 export default function NewButton() {
+  const {
+    isOpen: newDocumentIsOpen,
+    onClose: newDocumentOnClose,
+    onOpen: newDocumentOnOpen,
+  } = useDisclosure();
+  const {
+    isOpen: newGroupIsOpen,
+    onClose: newGroupOnClose,
+    onOpen: newGroupOnOpen,
+  } = useDisclosure();
   return (
     <Menu>
       <MenuButton
@@ -32,10 +42,15 @@ export default function NewButton() {
       <MenuList>
         <MenuItem>New Folder</MenuItem>
         <MenuDivider />
-        <MenuItem>Upload File</MenuItem>
+        <MenuItem onClick={() => newDocumentOnOpen()}>Upload File</MenuItem>
         <MenuDivider />
         <MenuItem>New Group</MenuItem>
       </MenuList>
+      <DocumentModal
+        isOpen={newDocumentIsOpen}
+        onClose={newDocumentOnClose}
+        onOpen={newDocumentOnOpen}
+      />
     </Menu>
   );
 }

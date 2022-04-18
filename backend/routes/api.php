@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PackController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
+use App\Models\Document;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -26,6 +29,7 @@ Route::get('/auth/refresh', [AuthController::class, 'refreshToken']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::post('/uploadDocument', [DocumentController::class], 'upload_document');
 });
 
 
