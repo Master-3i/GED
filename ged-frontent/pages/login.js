@@ -21,6 +21,10 @@ export default function Login() {
   const queryClient = useQueryClient();
   const router = useRouter();
 
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
   const loginUser = useMutation(
     async ({ email, password }) => {
       const { data } = await instance.post("/auth/login", {
@@ -30,21 +34,21 @@ export default function Login() {
       return data;
     },
     {
-      onSuccess: (data, variables, context) => {
-        console.log("data : ", data);
+      onSuccess: async (data, variables, context) => {
         queryClient.setQueryData("user", data);
         setAuthorizationHeader(data.token);
-        setToken(data)
-        router.push("/my-ged");
+        setToken(data);
       },
     }
   );
 
   const handleLogin = async (data) => {
     try {
-      const response =  await loginUser.mutate({ email: data.email, password: data.password });
-      console.log("response : ", response)
-      
+      const response = await loginUser.mutateAsync({
+        email: data.email,
+        password: data.password,
+      });
+      router.push("/my-ged");
     } catch (err) {
       console.error(err);
     }

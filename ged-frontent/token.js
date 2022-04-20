@@ -28,16 +28,16 @@ export const logout = () => {
 
 export const setToken = (data) => {
   if (data) {
+    setAuthorizationHeader(data.token);
     localStorage.setItem("GED_TOKEN", Encrypted(data));
     console.log(localStorage.getItem("GED_TOKEN"));
   }
 };
 
 export const getToken = () => {
-  let GED_TOKEN =
-     localStorage.getItem("GED_TOKEN")
-      ? Decrypted(localStorage.getItem("GED_TOKEN"))
-      : { user: null, userPack: null, token: null };
+  let GED_TOKEN = localStorage.getItem("GED_TOKEN")
+    ? Decrypted(localStorage.getItem("GED_TOKEN"))
+    : { user: null, userPack: null, token: null };
   return GED_TOKEN;
 };
 
@@ -47,6 +47,6 @@ export const refreshAccessToken = async () => {
   const { data } = await axios.get(
     "http://localhost:8000/api/auth/refresh?token=" + token
   );
-  setAuthorizationHeader(token);
+  setAuthorizationHeader(data.token);
   localStorage.setItem("GED_TOKEN", Encrypted(data));
 };

@@ -9,29 +9,32 @@ import { getToken, refreshAccessToken } from "../token";
 const queryClient = new QueryClient();
 
 MyApp.getInitialProps = async ({ ctx }) => {
-  setAuthorizationHeader(ctx.req?.cookies.gid)
   return {
     token: ctx.req?.cookies.gid ? ctx.req?.cookies.gid : null,
   };
 };
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps, token }) {
   useEffect(() => {
     refreshAccessToken();
-    // window.addEventListener("beforeunload", refreshAccessToken);
-    // return () => () => {
-    //   window.removeEventListener("beforeunload", refreshAccessToken);
-    // };
   }, []);
 
   // refreshAccessToken();
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider>
-        <Component {...pageProps} />
+        <InitialComponent token={token}>
+          <Component {...pageProps} token={token} />
+        </InitialComponent>
       </ChakraProvider>
     </QueryClientProvider>
   );
+}
+
+function InitialComponent({ children, token }) {
+  setAuthorizationHeader(token);
+
+  return <>{children}</>;
 }
 
 export default MyApp;

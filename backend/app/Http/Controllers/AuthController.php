@@ -40,7 +40,6 @@ class AuthController extends Controller
 
         $makeDir = Storage::disk('local')->makeDirectory($user->_id);
 
-        echo $makeDir;
 
         if (!$user) return response("Something went wrong, please try again ", 400);
 
