@@ -15,17 +15,25 @@ import {
 import { useRef, useState } from "react";
 import CreatableSelect from "react-select/creatable";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import instance from "../axiosConfig";
 
 export default function DocumentModal({ isOpen, onOpen, onClose }) {
   const [keywords, setKeywords] = useState([]);
   const { register, handleSubmit } = useForm();
   const [file, setFile] = useState();
+  const queryClient = useQueryClient();
 
-  const uplaodDocumentMutation = useMutation(async (data) => {
-    return await instance.post("/uploadDocument", data);
-  });
+  const uplaodDocumentMutation = useMutation(
+    async (data) => {
+      return await instance.post("/uploadDocument", data);
+    },
+    {
+      onSuccess: ({ data: responseData }) => {
+        queryClient.invalidateQueries("documents");
+      },
+    }
+  );
 
   const uploadDocument = (data) => {
     if (file == null) return;

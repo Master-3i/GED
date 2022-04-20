@@ -80,6 +80,7 @@ class DocumentController extends Controller
             $newDocument->keywords = explode(",", $request->keywords);
             $newDocument->is_archived = false;
             $newDocument->is_public = false;
+            $newDocument->user()->associate($user);
 
             $newDocument->save();
 

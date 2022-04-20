@@ -4,11 +4,12 @@ import { QueryClientProvider, QueryClient, useQueryClient } from "react-query";
 import { useEffect } from "react";
 import instance, { setAuthorizationHeader } from "../axiosConfig";
 import axios from "axios";
-import { refreshAccessToken } from "../token";
+import { getToken, refreshAccessToken } from "../token";
 
 const queryClient = new QueryClient();
 
 MyApp.getInitialProps = async ({ ctx }) => {
+  setAuthorizationHeader(ctx.req?.cookies.gid)
   return {
     token: ctx.req?.cookies.gid ? ctx.req?.cookies.gid : null,
   };

@@ -30,7 +30,7 @@ Route::get('/auth/refresh', [AuthController::class, 'refreshToken']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/uploadDocument', [DocumentController::class, 'store']);
-    Route::get('/userDocuments', [DocumentController::class], 'userDocuments');
+    Route::get('/userDocuments', [DocumentController::class, 'userDocuments']);
 });
 
 
