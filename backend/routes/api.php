@@ -29,13 +29,17 @@ Route::get('/auth/refresh', [AuthController::class, 'refreshToken']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
-    Route::post('/uploadDocument', [DocumentController::class], 'upload_document');
+    Route::post('/uploadDocument', [DocumentController::class, 'store']);
+    Route::get('/userDocuments', [DocumentController::class, 'userDocuments']);
 });
 
 
 Route::resource('packs', PackController::class)->only([
     'store', 'update', 'destroy', 'show'
 ]);
+
+
+
 
 Route::resource('posts', PostController::class)->only([
     'destroy', 'show', 'store', 'update'

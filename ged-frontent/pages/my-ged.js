@@ -11,11 +11,26 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { SidebarContent, MobileNav } from "../Component/NavBar";
+import instance from "../axiosConfig";
+import { useQuery, useQueryClient } from "react-query";
 
 export default function Myged() {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const [user, setUser] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const fetchUserDocuments = () => {
+    const { data } = instance.get("/userDocuments");
+    return data;
+  };
+
+  const { isLoading, isError, data, error } = useQuery(
+    "documents",
+    fetchUserDocuments,
+    { enabled: user != null }
+  );
+
   useEffect(() => {
     setUser(getToken().user);
     if (getToken().user == null) {
