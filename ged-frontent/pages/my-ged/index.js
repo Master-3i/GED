@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import SidebarWithHeader from "../Component/SideBar";
-import { getToken } from "../token";
+import SidebarWithHeader from "../../Component/SideBar";
+import { getToken } from "../../token";
 import { useRouter } from "next/router";
 import {
   Box,
@@ -18,8 +18,8 @@ import {
   MenuList,
   MenuItem,
 } from "@chakra-ui/react";
-import { SidebarContent, MobileNav } from "../Component/NavBar";
-import instance, { setAuthorizationHeader } from "../axiosConfig";
+import { SidebarContent, MobileNav } from "../../Component/NavBar";
+import instance, { setAuthorizationHeader } from "../../axiosConfig";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { BsThreeDotsVertical, BsFillShareFill } from "react-icons/bs";
 import {
@@ -28,7 +28,7 @@ import {
   AiOutlineDownload,
   AiFillEye,
 } from "react-icons/ai";
-import DocumentMenu from "../Component/DocumentMenu";
+import DocumentMenu from "../../Component/DocumentMenu";
 
 export default function Myged({ token }) {
   console.log(token);

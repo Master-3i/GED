@@ -116,9 +116,13 @@ export default function DocumentModal({
             <ModalHeader>Create your account</ModalHeader>
             <ModalCloseButton />
             <ModalBody pb={6}>
-              <FormControl mt={4}>
-                <Input type={"text"} {...register("label")} />
-              </FormControl>
+              {isUpdate && (
+                <FormControl mt={4}>
+                  <FormLabel>File Name</FormLabel>
+                  <Input type={"text"} {...register("label")} />
+                </FormControl>
+              )}
+
               <FormControl mt={4}>
                 <FormLabel>Keywords</FormLabel>
                 <CreatableSelect

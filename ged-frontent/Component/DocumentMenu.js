@@ -16,6 +16,7 @@ import {
 } from "react-icons/ai";
 import DocumentModal from "./DocumentModal";
 import instance from "../axiosConfig";
+import ShareDocumentModal from "./ShareDocumentModal";
 
 export default function DocumentMenu({
   setSelectedDocument,
@@ -23,6 +24,11 @@ export default function DocumentMenu({
   deleteDocumentMutation,
 }) {
   const { onClose, onOpen, isOpen } = useDisclosure();
+  const {
+    onClose: onCloseShare,
+    isOpen: isOpenShare,
+    onOpen: onOpenShare,
+  } = useDisclosure();
 
   const handleDownloadDocument = async () => {
     const { data } = await instance.get(
@@ -67,6 +73,7 @@ export default function DocumentMenu({
         <MenuItem
           icon={<BsFillShareFill size={"24px"} />}
           _hover={{ color: "purple.300" }}
+          onClick={onOpenShare}
         >
           Share
         </MenuItem>
@@ -90,6 +97,11 @@ export default function DocumentMenu({
         onClose={onClose}
         isOpen={isOpen}
         onOpen={onClose}
+      />
+      <ShareDocumentModal
+        isOpen={isOpenShare}
+        onClose={onCloseShare}
+        _id={singleDocument._id}
       />
     </Menu>
   );

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Document;
 use App\Models\Pack;
 use App\Models\PackUser;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -89,7 +90,7 @@ class DocumentController extends Controller
                 "size" => $request->file("document")->getSize(),
                 "path" => $path,
             ];
-            $newDocument->keywords = explode(",", $request->keywords);
+            $newDocument->keywords = $request->keywords ? explode(",", $request->keywords) : null;
             $newDocument->is_archived = false;
             $newDocument->is_public = false;
             $newDocument->user()->associate($user);
@@ -138,6 +139,29 @@ class DocumentController extends Controller
         $oldDocument->save();
 
         return response($oldDocument, 201);
+    }
+
+
+    public function share(Request $request, $id)
+    {
+        $noExist = array();
+        $document = Document::where("_id", $id)->first();
+        if (!$document) return response("No document under this id", 404);
+
+        foreach ($request->emails as $email) {
+            $user = User::where("email", $email)->first();
+            if (!$user) {
+                array_push($noExist, $email);
+                continue;
+            } elseif (!in_array($user->_id, $document->document_shared_user)) {
+                $document->push("document_shared_user", $user->_id);
+            }
+        }
+
+
+
+
+        return response(["noExist" => $noExist], 200);
     }
 
 
