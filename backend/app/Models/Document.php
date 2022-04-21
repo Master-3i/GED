@@ -14,11 +14,6 @@ class Document extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function document_shared_user()
-    {
-        return $this->hasMany(User::class);
-    }
-
     public function document_share_group()
     {
         return $this->hasMany(Group::class);
@@ -34,6 +29,7 @@ class Document extends Model
         "is_public",
         "is_archived",
         "keywords",
+        "document_shared_user"
     ];
 
     protected $connection = "mongodb";

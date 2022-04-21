@@ -30,8 +30,8 @@ import { useRouter } from "next/router";
 import NewButton from "./NewButton";
 
 const LinkItems = [
-  { name: "Mon GED", icon: AiFillFile },
-  { name: "Partagés avec moi", icon: BsShareFill },
+  { name: "Mon GED", icon: AiFillFile, link: "/my-ged" },
+  { name: "Partagés avec moi", icon: BsShareFill, link: "/my-ged/shared_w_me" },
 ];
 
 export const SidebarContent = ({ onClose, ...rest }) => {
@@ -65,7 +65,7 @@ export const SidebarContent = ({ onClose, ...rest }) => {
       </Flex>
 
       {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
+        <NavItem key={link.name} icon={link.icon} link={link.link}>
           {link.name}
         </NavItem>
       ))}
@@ -74,10 +74,10 @@ export const SidebarContent = ({ onClose, ...rest }) => {
   );
 };
 
-export const NavItem = ({ icon, children, ...rest }) => {
+export const NavItem = ({ icon, children, link, ...rest }) => {
   return (
     <Link
-      href="#"
+      href={link}
       style={{ textDecoration: "none" }}
       _focus={{ boxShadow: "none" }}
     >
