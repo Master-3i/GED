@@ -20,14 +20,15 @@ import {
 } from "@chakra-ui/react";
 import { SidebarContent, MobileNav } from "../Component/NavBar";
 import instance, { setAuthorizationHeader } from "../axiosConfig";
-import { useQuery, useQueryClient } from "react-query";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { BsThreeDotsVertical, BsFillShareFill } from "react-icons/bs";
 import {
   AiFillDelete,
   AiFillEdit,
   AiOutlineDownload,
   AiFillEye,
 } from "react-icons/ai";
+import DocumentMenu from "../Component/DocumentMenu";
 
 export default function Myged({ token }) {
   console.log(token);
@@ -35,6 +36,7 @@ export default function Myged({ token }) {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedDocument, setSelectedDocument] = useState();
 
   useEffect(() => {
     setUser(getToken().user);
@@ -44,12 +46,21 @@ export default function Myged({ token }) {
     }
   }, []);
 
-  console.log("all documents : ", queryClient.getQueryData("documents"));
-
   const fetchUserDocuments = async () => {
     const { data } = await instance.get("/userDocuments");
     return data;
   };
+
+  const deleteDocumentMutation = useMutation(
+    async () => {
+      return await instance.delete("/deleteDocument/" + selectedDocument._id);
+    },
+    {
+      onSuccess: (data, error) => {
+        queryClient.invalidateQueries("documents");
+      },
+    }
+  );
 
   const { isLoading, isError, data, error } = useQuery(
     "documents",
@@ -96,7 +107,7 @@ export default function Myged({ token }) {
                     <Box rounded={"md"} textAlign="center">
                       <HStack justifyContent={"center"}>
                         <Image
-                          src={singleDocument.file.ext+".png"}
+                          src={singleDocument.file.ext + ".png"}
                           h="130px"
                           w="50%"
                         />
@@ -111,40 +122,11 @@ export default function Myged({ token }) {
                     <Text fontWeight="semibold" color={"gray.600"}>
                       {singleDocument.file.label}
                     </Text>
-                    <Menu>
-                      <MenuButton>
-                        <Icon
-                          as={BsThreeDotsVertical}
-                          _hover={{ cursor: "pointer" }}
-                        />
-                      </MenuButton>
-                      <MenuList>
-                        <MenuItem
-                          icon={<AiFillDelete size={"24px"} />}
-                          _hover={{ color: "purple.300" }}
-                        >
-                          Delete
-                        </MenuItem>
-                        <MenuItem
-                          icon={<AiFillEdit size={"24px"} />}
-                          _hover={{ color: "purple.300" }}
-                        >
-                          Edit
-                        </MenuItem>
-                        <MenuItem
-                          icon={<AiFillEye size={"24px"} />}
-                          _hover={{ color: "purple.300" }}
-                        >
-                          Preview
-                        </MenuItem>
-                        <MenuItem
-                          icon={<AiOutlineDownload size={"24px"} />}
-                          _hover={{ color: "purple.300" }}
-                        >
-                          Download
-                        </MenuItem>
-                      </MenuList>
-                    </Menu>
+                    <DocumentMenu
+                      setSelectedDocument={setSelectedDocument}
+                      deleteDocumentMutation={deleteDocumentMutation}
+                      singleDocument={singleDocument}
+                    />
                   </HStack>
                 </Box>
               ))}

@@ -6,6 +6,7 @@ use App\Models\Document;
 use App\Models\Pack;
 use App\Models\PackUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentController extends Controller
 {
@@ -53,6 +54,15 @@ class DocumentController extends Controller
         $userPack->save();
     }
 
+
+    protected function freeUserStorage($size, $user)
+    {
+        $userPack = PackUser::where("user_id", $user->_id)->first();
+        $newUserStorage = round($userPack->user_storage, 4)  - round($size / 1024 / 1024 / 1024, 4);
+        $userPack->user_storage = round($newUserStorage, 4);
+        $userPack->save();
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -70,11 +80,13 @@ class DocumentController extends Controller
         if ($this->checkUserStorage($user, $request->file("document")->getSize(), true)) {
 
             $newDocument = new Document();
+            // $path = $request->file("document")->store($user->_id);
             $path = $request->file("document")->store($user->_id);
             $newDocument->file = [
                 "label" => $info->label,
                 "ext" => $request->file("document")->extension(),
                 "description" => $info->description,
+                "size" => $request->file("document")->getSize(),
                 "path" => $path,
             ];
             $newDocument->keywords = explode(",", $request->keywords);
@@ -119,6 +131,22 @@ class DocumentController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $oldDocument = Document::where("_id", $id)->first();
+        if (!$oldDocument) return response("No document under this id", 404);
+        $oldDocument->keywords = $request->keywords;
+        $oldDocument->file = ["label" => $request->label ? $request->label : $oldDocument->file["label"], "ext" => $oldDocument->file["ext"], "description" => $request->description ? $request->description : $oldDocument->file["description"], "size" => $oldDocument->file["size"], "path" => $oldDocument->file["path"]];
+        $oldDocument->save();
+
+        return response($oldDocument, 201);
+    }
+
+
+    public function download(Request $request, $id)
+    {
+        $document = Document::where("_id", $id)->first();
+        if (!$document) return response("No document under this id", 404);
+        $url = Storage::url($document->file["path"]);
+        return Storage::download($document->file["path"], $document->file["label"]);
     }
 
     /**
@@ -127,8 +155,17 @@ class DocumentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         //
+        $oldDocument = Document::where("_id", $id)->first();
+        $deleteDocument = Document::where("_id", $id)->delete();
+        $user = $request->user();
+        // here we should delete file from disk
+        if ($deleteDocument) {
+            Storage::delete($oldDocument->file["path"]);
+            $this->freeUserStorage($oldDocument->file["size"], $user);
+            return response($deleteDocument, 201);
+        } else return response("Something went wrong", 400);
     }
 }
