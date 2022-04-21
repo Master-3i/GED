@@ -31,6 +31,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/uploadDocument', [DocumentController::class, 'store']);
     Route::get('/userDocuments', [DocumentController::class, 'userDocuments']);
+    Route::delete('/deleteDocument/{id}', [DocumentController::class, 'destroy']);
+    Route::put('/updateDocument/{id}', [DocumentController::class, 'update']);
+    Route::get('/downloadDocument/{id}', [DocumentController::class, 'download']);
 });
 
 
