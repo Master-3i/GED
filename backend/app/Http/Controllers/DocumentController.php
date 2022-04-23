@@ -29,6 +29,15 @@ class DocumentController extends Controller
         return response(["documents" => $userDocuments], 200);
     }
 
+
+    public function userShareDocument(Request $request)
+    {
+        $user = $request->user();
+        $userShareDocument = Document::where("document_shared_user", "all", [$user->_id])->get();
+
+        return response($userShareDocument, 200);
+    }
+
     /** Upload document
      * @param  \App\Models\User $user
      * @param float $size
@@ -153,7 +162,7 @@ class DocumentController extends Controller
             if (!$user) {
                 array_push($noExist, $email);
                 continue;
-            } elseif (!in_array($user->_id, $document->document_shared_user)) {
+            } elseif (!in_array($user->_id, $document->document_shared_user ? $document->document_shared_user : [])) {
                 $document->push("document_shared_user", $user->_id);
             }
         }
@@ -191,5 +200,46 @@ class DocumentController extends Controller
             $this->freeUserStorage($oldDocument->file["size"], $user);
             return response($deleteDocument, 201);
         } else return response("Something went wrong", 400);
+    }
+
+
+
+    public function removeSharedDocument(Request $request, $id)
+    {
+        $document = Document::find($id);
+        if (!$document) return response("Document does not exist");
+        $document->pull("document_shared_user", $request->user()->_id);
+
+        return response($document, 201);
+    }
+
+
+    public function search(Request $request)
+    {
+        if (!$request->has("q")) return response("No valid query", 404);
+        $searchQuery = $request->query("q");
+        if (filter_var($searchQuery, FILTER_VALIDATE_EMAIL)) {
+            $searchedUser = User::where("email", $searchQuery)->first();
+            if (!$searchedUser) return response("", 200);
+            $allUserDocument = Document::where("user_id", $searchedUser->_id)->where("is_public", true)->get();
+            return response($allUserDocument, 200);
+        } else {
+            $keywords = explode(" ", $searchQuery);
+            foreach ($keywords as $k) {
+                echo "k = " . $k . "\n";
+                $searchKeywords = Document::where("keywords", "all", [$k])->get();
+                $searchByTitle = Document::where("file.label", "like", "%" . $k . "%")->get();
+                $searchByDescription = Document::where("file.description", "like", "%" . $k . "%")->get();
+                echo "By descriotn " . $searchByDescription . "\n";
+                echo "By keywords " . $searchKeywords . "\n";
+                echo "By title " . $searchByTitle . "\n";
+            }
+
+
+
+
+
+            return response("", 200);
+        }
     }
 }

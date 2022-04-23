@@ -34,7 +34,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/deleteDocument/{id}', [DocumentController::class, 'destroy']);
     Route::put('/updateDocument/{id}', [DocumentController::class, 'update']);
     Route::get('/downloadDocument/{id}', [DocumentController::class, 'download']);
-    Route::post("/shareDocument/{od}", [DocumentController::class, 'share']);
+    Route::post("/shareDocument/{id}", [DocumentController::class, 'share']);
+    Route::get("/sharedDocumentUser", [DocumentController::class, "userShareDocument"]);
+    Route::delete("/removeSharedDocument/{id}", [DocumentController::class, "removeSharedDocument"]);
+    Route::get("searchDocument", [DocumentController::class, "search"]);
 });
 
 

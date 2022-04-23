@@ -45,7 +45,8 @@ export const refreshAccessToken = async () => {
   const token = getToken()?.token;
   if (!token) return;
   const { data } = await axios.get(
-    "http://localhost:8000/api/auth/refresh?token=" + token
+    "http://localhost:8000/api/auth/refresh?token=" + token,
+    { withCredentials: true }
   );
   setAuthorizationHeader(data.token);
   localStorage.setItem("GED_TOKEN", Encrypted(data));

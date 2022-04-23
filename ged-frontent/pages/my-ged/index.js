@@ -17,6 +17,7 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  useToast,
 } from "@chakra-ui/react";
 import { SidebarContent, MobileNav } from "../../Component/NavBar";
 import instance, { setAuthorizationHeader } from "../../axiosConfig";
@@ -37,6 +38,7 @@ export default function Myged({ token }) {
   const [user, setUser] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedDocument, setSelectedDocument] = useState();
+  const toast = useToast();
 
   useEffect(() => {
     setUser(getToken().user);
@@ -58,6 +60,13 @@ export default function Myged({ token }) {
     {
       onSuccess: (data, error) => {
         queryClient.invalidateQueries("documents");
+        toast({
+          title: "Deleted Successfully",
+          status: "success",
+          isClosable: true,
+          duration: 5000,
+          position: "top",
+        });
       },
     }
   );

@@ -5,7 +5,6 @@ import {
   CloseButton,
   Button,
   Divider,
-  Link,
   Icon,
   useColorModeValue,
   IconButton,
@@ -18,6 +17,8 @@ import {
   MenuItem,
   MenuDivider,
 } from "@chakra-ui/react";
+
+import Link from "next/link";
 
 import { AiFillFile, AiOutlineFileAdd } from "react-icons/ai";
 import { BsShareFill } from "react-icons/bs";
