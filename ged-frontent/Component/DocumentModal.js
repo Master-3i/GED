@@ -11,6 +11,7 @@ import {
   ModalFooter,
   Button,
   Textarea,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import CreatableSelect from "react-select/creatable";
@@ -32,6 +33,7 @@ export default function DocumentModal({
       label: isUpdate ? document.file.label : "",
     },
   });
+  const toast = useToast();
   useEffect(() => {
     if (isUpdate) {
       if (document?.keywords?.length > 0) {
@@ -54,6 +56,25 @@ export default function DocumentModal({
     {
       onSuccess: ({ data: responseData }) => {
         queryClient.invalidateQueries("documents");
+        toast({
+          title: "Document Created !",
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+          position: "top",
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Something went wrong !",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top",
+        });
+      },
+      onSettled: () => {
+        onClose();
       },
     }
   );
@@ -69,10 +90,27 @@ export default function DocumentModal({
           ["documents", { _id: updatedData._id }],
           updatedData
         );
+        toast({
+          title: "Document Updated !",
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+          position: "top",
+        });
         return updatedData;
+      },
+      onError: () => {
+        toast({
+          title: "Something went wrong !",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top",
+        });
       },
       onSettled: (updatedData) => {
         queryClient.invalidateQueries("documents");
+        onClose();
       },
     }
   );
@@ -152,8 +190,8 @@ export default function DocumentModal({
                 mr={3}
                 type="submit"
                 color="white"
-                bg={"purple.300"}
-                _hover={{ backgroundColor: "purple.500" }}
+                bg={"blue.300"}
+                _hover={{ backgroundColor: "blue.500" }}
               >
                 Save
               </Button>

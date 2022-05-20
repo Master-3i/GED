@@ -5,8 +5,10 @@ import { useEffect } from "react";
 import instance, { setAuthorizationHeader } from "../axiosConfig";
 import axios from "axios";
 import { getToken, refreshAccessToken } from "../token";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 const queryClient = new QueryClient();
+
 
 MyApp.getInitialProps = async ({ ctx }) => {
   return {
@@ -22,6 +24,7 @@ function MyApp({ Component, pageProps, token }) {
   // refreshAccessToken();
   return (
     <QueryClientProvider client={queryClient}>
+
       <ChakraProvider>
         <InitialComponent token={token}>
           <Component {...pageProps} token={token} />

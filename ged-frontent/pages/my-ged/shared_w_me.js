@@ -53,7 +53,9 @@ export default function SharedWithMe({ token }) {
 
   const deleteDocumentMutation = useMutation(
     async () => {
-      return await instance.delete("/removeSharedDocument/" + selectedDocument._id);
+      return await instance.delete(
+        "/removeSharedDocument/" + selectedDocument._id
+      );
     },
     {
       onSuccess: (data, error) => {
@@ -65,6 +67,38 @@ export default function SharedWithMe({ token }) {
   const { isLoading, isError, data, error } = useQuery(
     "sharedDocumentUser",
     fetchUserSharedDocuments,
+    { enabled: user != null }
+  );
+
+  const fetchGroups = async () => {
+    const { data } = await instance.get("/groups");
+    return data;
+  };
+
+  const { isLoading: groupLoading, data: groupData } = useQuery(
+    "groups",
+    fetchGroups,
+    { enabled: user != null }
+  );
+
+  const fetchPackUser = async () => {
+    const { data } = await instance.get("/billing/UserPack");
+    return data;
+  };
+  const { isLoading: userPackLoading, data: userPackData } = useQuery(
+    "userPack",
+    fetchPackUser,
+    { enabled: user != null }
+  );
+
+  
+  const fetchPack = async () => {
+    const { data } = await instance.get("/billing/pack");
+    return data;
+  };
+  const { isLoading: packLoading, data: packData } = useQuery(
+    "pack",
+    fetchPack,
     { enabled: user != null }
   );
 
@@ -107,7 +141,7 @@ export default function SharedWithMe({ token }) {
                     <Box rounded={"md"} textAlign="center">
                       <HStack justifyContent={"center"}>
                         <Image
-                          src={"/"+singleDocument.file.ext + ".png"}
+                          src={"/" + singleDocument.file.ext + ".png"}
                           h="130px"
                           w="50%"
                         />

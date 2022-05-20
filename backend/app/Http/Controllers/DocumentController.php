@@ -6,6 +6,7 @@ use App\Models\Document;
 use App\Models\Pack;
 use App\Models\PackUser;
 use App\Models\User;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -90,8 +91,7 @@ class DocumentController extends Controller
         if ($this->checkUserStorage($user, $request->file("document")->getSize(), true)) {
 
             $newDocument = new Document();
-            // $path = $request->file("document")->store($user->_id);
-            $path = $request->file("document")->store($user->_id);
+            $path = $request->file("document")->store("/public/" . $user->_id);
             $newDocument->file = [
                 "label" => $info->label,
                 "ext" => $request->file("document")->extension(),
@@ -167,6 +167,13 @@ class DocumentController extends Controller
             }
         }
 
+        if (count($request->groups) > 0) {
+            $document->document_shared_group = $request->groups;
+        }
+
+
+        $document->save();
+
 
 
 
@@ -178,7 +185,6 @@ class DocumentController extends Controller
     {
         $document = Document::where("_id", $id)->first();
         if (!$document) return response("No document under this id", 404);
-        $url = Storage::url($document->file["path"]);
         return Storage::download($document->file["path"], $document->file["label"]);
     }
 
@@ -213,6 +219,16 @@ class DocumentController extends Controller
         return response($document, 201);
     }
 
+    public function removeFromGroup(Request $request, $documentid, $groupid)
+    {
+        $document = Document::where("_id", $documentid)->first();
+        if (!$document) return response("Document does not exist", 404);
+        $document->pull("document_shared_group", $groupid);
+        $document->save();
+
+        return response("document removed from group", 200);
+    }
+
 
     public function search(Request $request)
     {
@@ -220,26 +236,56 @@ class DocumentController extends Controller
         $searchQuery = $request->query("q");
         if (filter_var($searchQuery, FILTER_VALIDATE_EMAIL)) {
             $searchedUser = User::where("email", $searchQuery)->first();
+            if ($searchQuery == $searchedUser->email) {
+                $allUserDocument = Document::where("user_id", $searchedUser->_id)->get();
+                return response($allUserDocument, 200);
+            }
             if (!$searchedUser) return response("", 200);
             $allUserDocument = Document::where("user_id", $searchedUser->_id)->where("is_public", true)->get();
             return response($allUserDocument, 200);
         } else {
             $keywords = explode(" ", $searchQuery);
+            $oldResult = [];
+            $oldResultUser = [];
             foreach ($keywords as $k) {
-                echo "k = " . $k . "\n";
-                $searchKeywords = Document::where("keywords", "all", [$k])->get();
-                $searchByTitle = Document::where("file.label", "like", "%" . $k . "%")->get();
-                $searchByDescription = Document::where("file.description", "like", "%" . $k . "%")->get();
-                echo "By descriotn " . $searchByDescription . "\n";
-                echo "By keywords " . $searchKeywords . "\n";
-                echo "By title " . $searchByTitle . "\n";
+                $testSearch = Document::where("keywords", "all", [$k])->orWhere("file.label", "like", "%" . $k . "%")->orWhere("file.description", "like", "%" . $k . "%")->get();
+                foreach ($testSearch as $t) {
+                    $exist = false;
+                    foreach ($oldResult as $o) {
+                        if ($o->_id == $t->_id) {
+                            $exist = true;
+                        }
+                    }
+                    if (!$exist) array_push($oldResult, $t);
+                }
+            }
+            foreach ($keywords as $k) {
+                $testSearch = Document::where("user_id", $request->user()->_id)->Where("keywords", "all", [$k])->orWhere("file.label", "like", "%" . $k . "%")->orWhere("file.description", "like", "%" . $k . "%")->get();
+                foreach ($testSearch as $t) {
+                    $exist = false;
+                    foreach ($oldResultUser as $o) {
+                        if ($o->_id == $t->_id) {
+                            $exist = true;
+                        }
+                    }
+                    if (!$exist) array_push($oldResultUser, $t);
+                }
             }
 
+            $response = [
+                "user_result" => $oldResultUser,
+                "result" => $oldResult
+            ];
 
-
-
-
-            return response("", 200);
+            return response($response, 200);
         }
+    }
+
+
+    protected function filter_search_result($k, $t, $d, $old)
+    {
+        $mergedArrays = array_merge($k, $t, $d, $old);
+        $result = array_unique($mergedArrays);
+        return $result;
     }
 }

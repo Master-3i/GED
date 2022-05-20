@@ -9,6 +9,7 @@ import {
 
 import { AiFillPlusSquare } from "react-icons/ai";
 import DocumentModal from "./DocumentModal";
+import GroupModal from "./GroupModal";
 
 export default function NewButton() {
   const {
@@ -32,24 +33,27 @@ export default function NewButton() {
         borderWidth="1px"
         fontWeight={"bold"}
         color="white"
-        bg={"purple.300"}
-        _hover={{ backgroundColor: "purple.500" }}
-        _expanded={{ bg: "purple.500" }}
+        bg={"blue.400"}
+        _hover={{ backgroundColor: "blue.500" }}
+        _expanded={{ bg: "blue.500" }}
         _focus={{ boxShadow: "none" }}
       >
         Create New
       </MenuButton>
       <MenuList>
-        <MenuItem>New Folder</MenuItem>
-        <MenuDivider />
         <MenuItem onClick={() => newDocumentOnOpen()}>Upload File</MenuItem>
         <MenuDivider />
-        <MenuItem>New Group</MenuItem>
+        <MenuItem onClick={() => newGroupOnOpen()}>New Group</MenuItem>
       </MenuList>
       <DocumentModal
         isOpen={newDocumentIsOpen}
         onClose={newDocumentOnClose}
         onOpen={newDocumentOnOpen}
+      />
+      <GroupModal
+        onClose={newGroupOnClose}
+        isOpen={newGroupIsOpen}
+        onOpen={newGroupOnOpen}
       />
     </Menu>
   );

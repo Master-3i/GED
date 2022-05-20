@@ -2,6 +2,7 @@ import axios from "axios";
 import AES from "crypto-js/aes";
 import CryptoJS from "crypto-js/core";
 import { setAuthorizationHeader } from "./axiosConfig";
+import { QueryClient} from "react-query";
 
 const isBrowser = () => typeof Window !== "undefined";
 

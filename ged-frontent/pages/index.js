@@ -41,7 +41,7 @@ export default function Index() {
                     type={"email"}
                     placeholder={"Email Address"}
                     _placeholder={{ color: "gray.500" }}
-                    _focus={{ borderColor: "purple.300", borderWidth: "2px" }}
+                    _focus={{ borderColor: "blue.300", borderWidth: "2px" }}
                     {...register("email", { required: true })}
                   />
                 </FormControl>
@@ -50,19 +50,19 @@ export default function Index() {
                     type={"password"}
                     placeholder={"Password"}
                     _placeholder={{ color: "gray.500" }}
-                    _focus={{ borderColor: "purple.300", borderWidth: "2px" }}
+                    _focus={{ borderColor: "blue.300", borderWidth: "2px" }}
                     {...register("password", { required: true, minLength: 8 })}
                   />
                 </FormControl>
                 <Button
-                  bgColor={"purple.300"}
-                  _hover={{ backgroundColor: "purple.500" }}
+                  bgColor={"blue.300"}
+                  _hover={{ backgroundColor: "blue.500" }}
                   color="white"
                   type="submit"
                 >
                   Sign in
                 </Button>
-                <Text color={"purple.300"} as="a" fontWeight={"semibold"}>
+                <Text color={"blue.300"} as="a" fontWeight={"semibold"}>
                   Forgot Password ?
                 </Text>
                 <HStack>

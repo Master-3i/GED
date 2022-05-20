@@ -1,11 +1,15 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PackController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\UserController;
 use App\Models\Document;
 
 /*
@@ -38,6 +42,23 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get("/sharedDocumentUser", [DocumentController::class, "userShareDocument"]);
     Route::delete("/removeSharedDocument/{id}", [DocumentController::class, "removeSharedDocument"]);
     Route::get("searchDocument", [DocumentController::class, "search"]);
+    Route::post("/group/store", [GroupController::class, "store"]);
+    Route::get("/groups", [GroupController::class, "index"]);
+    Route::get("/group/{id}", [GroupController::class, "show"]);
+    Route::get("/user/removePicure", [UserController::class, "removePicture"]);
+    Route::post("/user/updatePicture", [UserController::class, "updatePicture"]);
+    Route::post("/user/update", [UserController::class, "update"]);
+    Route::post("/user/updatePassword", [UserController::class, "updatePassword"]);
+    Route::get("/document/removefromgroup/{documentid}/{goupid}", [DocumentController::class, "removeFromGroup"]);
+    Route::get("/group/inviteUser/{id}/{email}", [GroupController::class, "inviteUser"]);
+    Route::get("/group/removeUser/{userId}/{groupId}", [GroupController::class, "removeUser"]);
+    Route::post("/group/updateGroupName/{id}", [GroupController::class, "updateGroupName"]);
+    Route::delete("/group/destroy/{id}", [GroupController::class, "destroy"]);
+    Route::get("/billing/UserPack", [BillingController::class, "UserPack"]);
+    Route::get("/billing/pack", [BillingController::class, "pack"]);
+    Route::get("/pack/packs", [PackController::class, "AllPacks"]);
+    Route::post("/history/success", [PaymentController::class, "store"]);
+    Route::get("/histories", [PaymentController::class, "index"]);
 });
 
 

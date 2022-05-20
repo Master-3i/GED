@@ -14,7 +14,11 @@ class Pack extends Model
         'package_name',
         'storage_limit',
         'group_limit',
-        'group_storage_limit'
+        'group_storage_limit',
+        'features',
+        'price_month',
+        'price_6_month',
+        'price_annually'
     ];
 
 
