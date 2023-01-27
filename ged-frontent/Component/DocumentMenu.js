@@ -22,6 +22,10 @@ export default function DocumentMenu({
   setSelectedDocument,
   singleDocument,
   deleteDocumentMutation,
+  isOther,
+  isGroup,
+  isRemove,
+  canRemove,
 }) {
   const { onClose, onOpen, isOpen } = useDisclosure();
   const {
@@ -56,36 +60,50 @@ export default function DocumentMenu({
         <Icon as={BsThreeDotsVertical} _hover={{ cursor: "pointer" }} />
       </MenuButton>
       <MenuList>
-        <MenuItem
-          icon={<AiFillDelete size={"24px"} />}
-          _hover={{ color: "purple.300" }}
-          onClick={() => deleteDocumentMutation.mutate()}
-        >
-          Delete
-        </MenuItem>
-        <MenuItem
-          icon={<AiFillEdit size={"24px"} />}
-          _hover={{ color: "purple.300" }}
-          onClick={onOpen}
-        >
-          Edit
-        </MenuItem>
-        <MenuItem
-          icon={<BsFillShareFill size={"24px"} />}
-          _hover={{ color: "purple.300" }}
-          onClick={onOpenShare}
-        >
-          Share
-        </MenuItem>
-        <MenuItem
-          icon={<AiFillEye size={"24px"} />}
-          _hover={{ color: "purple.300" }}
-        >
-          Preview
-        </MenuItem>
+        {isRemove && (
+          <MenuItem
+            icon={<AiFillDelete size={"24px"} />}
+            _hover={{ color: "blue.500" }}
+            onClick={() => deleteDocumentMutation.mutate()}
+            isDisabled={isOther}
+          >
+            Remove from group
+          </MenuItem>
+        )}
+        {!isRemove && (
+          <MenuItem
+            icon={<AiFillDelete size={"24px"} />}
+            _hover={{ color: "blue.500" }}
+            onClick={() => deleteDocumentMutation.mutate()}
+            isDisabled={isOther}
+          >
+            Delete
+          </MenuItem>
+        )}
+
+        {!isGroup && (
+          <MenuItem
+            icon={<AiFillEdit size={"24px"} />}
+            _hover={{ color: "blue.500" }}
+            onClick={onOpen}
+            isDisabled={isOther}
+          >
+            Edit
+          </MenuItem>
+        )}
+        {!isGroup && (
+          <MenuItem
+            icon={<BsFillShareFill size={"24px"} />}
+            _hover={{ color: "blue.500" }}
+            onClick={onOpenShare}
+            isDisabled={isOther}
+          >
+            Share
+          </MenuItem>
+        )}
         <MenuItem
           icon={<AiOutlineDownload size={"24px"} />}
-          _hover={{ color: "purple.300" }}
+          _hover={{ color: "blue.500" }}
           onClick={() => handleDownloadDocument()}
         >
           Download

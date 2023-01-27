@@ -17,6 +17,7 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  useToast,
 } from "@chakra-ui/react";
 import { SidebarContent, MobileNav } from "../../Component/NavBar";
 import instance, { setAuthorizationHeader } from "../../axiosConfig";
@@ -31,12 +32,12 @@ import {
 import DocumentMenu from "../../Component/DocumentMenu";
 
 export default function Myged({ token }) {
-  console.log(token);
   const queryClient = useQueryClient();
   const router = useRouter();
   const [user, setUser] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedDocument, setSelectedDocument] = useState();
+  const toast = useToast();
 
   useEffect(() => {
     setUser(getToken().user);
@@ -58,9 +59,22 @@ export default function Myged({ token }) {
     {
       onSuccess: (data, error) => {
         queryClient.invalidateQueries("documents");
+        toast({
+          title: "Deleted Successfully",
+          status: "success",
+          isClosable: true,
+          duration: 5000,
+          position: "top",
+        });
       },
     }
   );
+
+
+  const fetchGroups = async () => {
+    const { data } = await instance.get("/groups");
+    return data;
+  };
 
   const { isLoading, isError, data, error } = useQuery(
     "documents",
@@ -68,6 +82,32 @@ export default function Myged({ token }) {
     { enabled: user != null }
   );
 
+  const { isLoading: groupLoading, data: groupData } = useQuery(
+    "groups",
+    fetchGroups,
+    { enabled: user != null }
+  );
+
+  const fetchPackUser = async () => {
+    const { data } = await instance.get("/billing/UserPack");
+    return data;
+  };
+  const { isLoading: userPackLoading, data: userPackData } = useQuery(
+    "userPack",
+    fetchPackUser,
+    { enabled: user != null }
+  );
+
+  
+  const fetchPack = async () => {
+    const { data } = await instance.get("/billing/pack");
+    return data;
+  };
+  const { isLoading: packLoading, data: packData } = useQuery(
+    "pack",
+    fetchPack,
+    { enabled: user != null }
+  );
   if (user && data) {
     return (
       <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
@@ -85,7 +125,7 @@ export default function Myged({ token }) {
           size="full"
         >
           <DrawerContent>
-            <SidebarContent onClose={onClose} />
+            <SidebarContent onClose={onClose}  />
           </DrawerContent>
         </Drawer>
         {/* mobilenav */}
@@ -107,7 +147,7 @@ export default function Myged({ token }) {
                     <Box rounded={"md"} textAlign="center">
                       <HStack justifyContent={"center"}>
                         <Image
-                          src={singleDocument.file.ext + ".png"}
+                          src={"/"+singleDocument.file.ext + ".png"}
                           h="130px"
                           w="50%"
                         />

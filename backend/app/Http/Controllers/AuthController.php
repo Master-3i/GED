@@ -193,6 +193,6 @@ class AuthController extends Controller
             "token" => $oldToken,
             "pack" => $pack
         ];
-        return response($response, 200);
+        return response($response, 200)->cookie("gid", $oldToken);
     }
 }

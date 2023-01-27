@@ -2,6 +2,7 @@ import axios from "axios";
 import AES from "crypto-js/aes";
 import CryptoJS from "crypto-js/core";
 import { setAuthorizationHeader } from "./axiosConfig";
+import { QueryClient} from "react-query";
 
 const isBrowser = () => typeof Window !== "undefined";
 
@@ -45,7 +46,8 @@ export const refreshAccessToken = async () => {
   const token = getToken()?.token;
   if (!token) return;
   const { data } = await axios.get(
-    "http://localhost:8000/api/auth/refresh?token=" + token
+    "http://localhost:8000/api/auth/refresh?token=" + token,
+    { withCredentials: true }
   );
   setAuthorizationHeader(data.token);
   localStorage.setItem("GED_TOKEN", Encrypted(data));

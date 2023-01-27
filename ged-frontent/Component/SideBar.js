@@ -34,6 +34,7 @@ import {
   FiBell,
   FiChevronDown,
 } from "react-icons/fi";
+import { AiOutlineSearch } from "react-icons/ai";
 import { AiFillFile, AiOutlineFileAdd } from "react-icons/ai";
 import { BsShareFill } from "react-icons/bs";
 import { IconType } from "react-icons";
@@ -50,7 +51,7 @@ const LinkItems = [
 
 export default function SidebarWithHeader({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const {user} = getToken();
+  const { user } = getToken();
   const queryClient = useQueryClient();
   return (
     <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
@@ -110,9 +111,9 @@ const SidebarContent = ({ onClose, ...rest }) => {
         <Button
           leftIcon={<AiOutlineFileAdd />}
           w="full"
-          bg={"purple.300"}
+          bg={"blue.300"}
           color="white"
-          _hover={{ backgroundColor: "purple.500" }}
+          _hover={{ backgroundColor: "blue.500" }}
         >
           Nouveau
         </Button>
@@ -143,7 +144,7 @@ const NavItem = ({ icon, children, ...rest }) => {
         role="group"
         cursor="pointer"
         _hover={{
-          bg: "purple.300",
+          bg: "blue.300",
           color: "white",
         }}
         {...rest}
@@ -211,7 +212,7 @@ const MobileNav = ({ onOpen, user, ...rest }) => {
           size="lg"
           variant="ghost"
           aria-label="open menu"
-          icon={<FiBell />}
+          icon={<AiOutlineSearch />}
         />
         <Flex alignItems={"center"}>
           <Menu>

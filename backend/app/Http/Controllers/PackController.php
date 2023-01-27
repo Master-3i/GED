@@ -29,14 +29,21 @@ class PackController extends Controller
             'package_name' => "required|unique:packs",
             'storage_limit' => "required",
             'group_limit' => "required",
-            'group_storage_limit' => "required"
+            'price_month' => "required",
+            'price_6_month' => "required",
+            'price_annually' => "required",
+            'features' => "required"
         ]);
 
         $newPack = new Pack;
         $newPack->package_name = $validate['package_name'];
         $newPack->storage_limit = $validate['storage_limit'];
         $newPack->group_limit = $validate['group_limit'];
-        $newPack->group_storage_limit = $validate['group_storage_limit'];
+
+        $newPack->price_month = $validate['price_month'];
+        $newPack->price_6_month = $validate['price_6_month'];
+        $newPack->price_annually = $validate['price_annually'];
+        $newPack->features = $validate["features"];
 
         $storePack = $newPack->save();
         if (!$storePack) return response('Something went wrong', 400);
@@ -75,13 +82,20 @@ class PackController extends Controller
             'package_name' => "required|unique:packs",
             'storage_limit' => "required",
             'group_limit' => "required",
-            'group_storage_limit' => "required"
+            'price_month' => "required",
+            'price_6_month' => "required",
+            'price_annually' => "required",
+            'features' => "required"
         ]);
 
         $showPack->package_name = $validate['package_name'];
         $showPack->storage_limit = $validate['storage_limit'];
         $showPack->group_limit = $validate['group_limit'];
-        $showPack->group_storage_limit = $validate['group_storage_limit'];
+        $showPack->price_month = $validate['price_month'];
+        $showPack->price_6_month = $validate['price_6_month'];
+        $showPack->price_annually = $validate['price_annually'];
+        $showPack->features = $validate["features"];
+
 
         $updatePack = $showPack->update();
 
@@ -103,5 +117,12 @@ class PackController extends Controller
         if (!$showPack) return response('No Pack under this id', 400);
         $deletePack = $showPack->delete();
         return response($deletePack, 201);
+    }
+
+    public function AllPacks()
+    {
+        $packs = Pack::all();
+
+        return response($packs, 200);
     }
 }
